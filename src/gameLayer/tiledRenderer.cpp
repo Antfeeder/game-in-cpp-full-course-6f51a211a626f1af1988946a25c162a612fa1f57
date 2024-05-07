@@ -6,6 +6,7 @@ void TiledRenderer::render(gl2d::Renderer2D &renderer)
 
 	auto viewRect = renderer.getViewRect();
 	//this allows us to see what we can see
+	//paralax added
     glm::vec2 paralaxDistance = {viewRect.x, viewRect.y};
     paralaxDistance *= -paralaxStrength;
 
