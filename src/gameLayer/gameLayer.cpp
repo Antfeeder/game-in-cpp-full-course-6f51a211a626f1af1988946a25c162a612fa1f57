@@ -39,7 +39,7 @@ bool initGame()
 	spaceShipTexture.loadFromFile(RESOURCES_PATH "spaceShip/ships/green.png", true);
 	backgroundTexture[0].loadFromFile(RESOURCES_PATH "background1.png", true);
 	backgroundTexture[1].loadFromFile(RESOURCES_PATH "background2.png", true);
-	backgroundTexture[2].loadFromFile(RESOURCES_PATH "background3.png", true);
+	backgroundTexture[2].loadFromFile(RESOURCES_PATH "background4.png", true);
 
 	
 
@@ -68,6 +68,8 @@ bool gameLogic(float deltaTime)
 	glClear(GL_COLOR_BUFFER_BIT); //clear screen
 
 	renderer.updateWindowMetrics(w, h);
+
+#pragma endregion
 
 #pragma region movement
 	glm::vec2 move = {};
@@ -107,6 +109,19 @@ bool gameLogic(float deltaTime)
 		move *= deltaTime * 1000;
 		data.playerPos += move;
 	}
+#pragma endregion
+
+#pragma region follow
+
+
+	renderer.currentCamera.follow(data.playerPos, deltaTime * 150, 10, 200, w, h);
+
+	constexpr float shipSize = 250.f;
+
+
+
+#pragma endregion
+
 
 #pragma region render background
 
@@ -119,9 +134,26 @@ bool gameLogic(float deltaTime)
 #pragma endregion
 
 
-	renderer.currentCamera.follow(data.playerPos, deltaTime * 150, 10, 200, w, h);
-	renderer.renderRectangle({data.playerPos, 200, 200}, spaceShipTexture);
+#pragma region mouse pos
+	glm::vec2 mousePos = platform::getRelMousePosition();
+	glm::vec2 screenCenter(w /2.f ,h / 2.f);
 
+	glm::vec2 mouseDirection = mousePos - screenCenter;
+
+	if (glm::length(mouseDirection) == 0.f)
+	{
+		mouseDirection = {1,0};
+	}
+	else{
+		mouseDirection = normalize(mouseDirection);
+	}
+	float spaceShipAngle = atan2(mouseDirection.y, -mouseDirection.x);
+#pragma endregion
+
+
+#pragma region render
+	renderer.renderRectangle({data.playerPos- glm::vec2(shipSize/2, shipSize/2), shipSize, shipSize}, spaceShipTexture,Colors_White, {}, glm::degrees(spaceShipAngle) + 90.f);
+#pragma endregion
 
 	renderer.flush();
 
